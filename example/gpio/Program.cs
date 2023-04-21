@@ -4,14 +4,24 @@ using static System.Console;
 using System.Device.Gpio;
 
 
-
-int pin = 18;
 using var controller = new GpioController();
-controller.OpenPin(pin, PinMode.Output);
-bool ledOn = true;
+for(int i=1;i<20;i++){
+    controller.OpenPin(i, PinMode.Output);
+}
+
+
+
+
 while (true)
 {
-    controller.Write(pin, ((ledOn) ? PinValue.High : PinValue.Low));
-    Thread.Sleep(1000);
-    ledOn = !ledOn;
+
+
+    for(int i=1;i<20;i++){
+        controller.Write(i, PinValue.High);
+        Thread.Sleep(1000);
+        controller.Write(i, PinValue.Low);
+    }
+
+    
+
 }
