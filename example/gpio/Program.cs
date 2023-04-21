@@ -3,6 +3,9 @@ using static System.Console;
 
 using System.Device.Gpio;
 
+
+
+//IO使用sys定义
 int i = 18;
 
 using var controller = new GpioController();
