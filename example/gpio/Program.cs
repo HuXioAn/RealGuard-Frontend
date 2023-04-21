@@ -3,16 +3,13 @@ using static System.Console;
 
 using System.Device.Gpio;
 
+int i = 18;
 
 using var controller = new GpioController();
-for(int i=1;i<20;i++){
-    try{
-        controller.OpenPin(i, PinMode.Output);
-    }
-    catch(System.Exception e){
-        WriteLine("Pin{0}:{1}",i,e.Message);
-    }
-}
+
+controller.OpenPin(i, PinMode.Output);
+
+
 
 
 
@@ -21,18 +18,10 @@ while (true)
 {
 
 
-    for(int i=1;i<20;i++){
-        try{
-            controller.Write(i, PinValue.High);
-            Thread.Sleep(1000);
-            controller.Write(i, PinValue.Low);
-        
-        }
-        catch(System.Exception e){
-            WriteLine("Pin{0}:{1}",i,e.Message);
-        }
-        
-    }
+    controller.Write(i, PinValue.High);
+    Thread.Sleep(1000);
+    controller.Write(i, PinValue.Low);
+    Thread.Sleep(1000);
 
     
 
