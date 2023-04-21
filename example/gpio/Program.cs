@@ -12,7 +12,7 @@ int k = 79;
 using var controller = new GpioController();
 
 controller.OpenPin(i, PinMode.Output);
-controller.OpenPin(k,PinMode.Input,PinValue.High);
+controller.OpenPin(k,PinMode.InputPullUp,PinValue.High);
 controller.RegisterCallbackForPinValueChangedEvent(k,PinEventTypes.Falling,dele);
 
 while (true)
