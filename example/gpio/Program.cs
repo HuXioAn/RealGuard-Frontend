@@ -7,13 +7,20 @@ var dele = new PinChangeEventHandler(isr);
 
 //IO使用sys定义
 int i = 18;
-int k = 79;
+int k = 200;
 
 using var controller = new GpioController();
 
 controller.OpenPin(i, PinMode.Output);
-controller.OpenPin(k,PinMode.InputPullUp,PinValue.High);
+
+if(controller.IsPinModeSupported(k,PinMode.InputPullUp))
+    controller.OpenPin(k,PinMode.InputPullUp,PinValue.High);
+else
+    WriteLine("Pin{0} can not be inside pullup.",k);
+    controller.OpenPin(k,PinMode.Input,PinValue.High);
+
 controller.RegisterCallbackForPinValueChangedEvent(k,PinEventTypes.Falling,dele);
+
 
 while (true)
 {
