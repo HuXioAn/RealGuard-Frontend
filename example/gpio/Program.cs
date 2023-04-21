@@ -14,6 +14,11 @@ using var controller = new GpioController();
 controller.OpenPin(i, PinMode.Output);
 
 if(controller.IsPinModeSupported(k,PinMode.InputPullUp))
+    //上拉无望
+    /*
+    https://developer.nvidia.com/embedded/dlc/Jetson-Nano-40-Pin-Expansion-Header-1.1
+    */
+
     controller.OpenPin(k,PinMode.InputPullUp,PinValue.High);
 else
     WriteLine("Pin{0} can not be inside pullup.",k);
