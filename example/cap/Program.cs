@@ -47,32 +47,29 @@ Colorizer color_map = new Colorizer();
 using(var frames = pipe.WaitForFrames()){
     
 
-    // var depthFrame = frames.DepthFrame.DisposeWith(frames);
-    // var colorizedDepth = color_map.Process<VideoFrame>(depthFrame).DisposeWith(frames);
-    // Bitmap DepthImg = new System.Drawing.Bitmap(depthFrame.Width, depthFrame.Height, depthFrame.Stride, System.Drawing.Imaging.PixelFormat.Format8bppIndexed, colorizedDepth.Data);
-    // WriteLine("depthImg:Height:{0},Width:{1}",DepthImg.Height,DepthImg.Width);
-    // var newDepth = new Bitmap(DepthImg);
-    // newDepth.Save("./pic/depth.png",System.Drawing.Imaging.ImageFormat.Png);
-    // WriteLine("depthFrame:Height:{0},Width:{1}",depthFrame.Height,depthFrame.Width);
+    var depthFrame = frames.DepthFrame.DisposeWith(frames);
+    var colorizedDepth = color_map.Process<VideoFrame>(depthFrame).DisposeWith(frames);
+    
+    var depthByte = new byte[colorizedDepth.DataSize];
+    Marshal.Copy(colorizedDepth.Data,depthByte,0,colorizedDepth.DataSize);
+
+    var depthImg = Image.LoadPixelData<Rgb24>(depthByte,depthFrame.Width,depthFrame.Height);
+    WriteLine("depthImg:Height:{0},Width:{1}",depthImg.Height,depthImg.Width);
+
+    depthImg.Save("./pic/depthImg.jpg");
+    WriteLine("depthFrame:Height:{0},Width:{1}",depthFrame.Height,depthFrame.Width);
 
 
 
     var irFrame = frames.InfraredFrame.DisposeWith(frames);
-    //Bitmap irImg = new System.Drawing.Bitmap(irFrame.Width, irFrame.Height, irFrame.Stride, System.Drawing.Imaging.PixelFormat.Format8bppIndexed, irFrame.Data);
-    //Bitmap irImg = new System.Drawing.Bitmap(irFrame.Height, irFrame.Width, irFrame.Stride, System.Drawing.Imaging.PixelFormat.Format24bppRgb, irFrame.Data);
-    
-    //var img = SixLabors.ImageSharp.Image.Load();
+
     var irByte = new byte[irFrame.DataSize];
     Marshal.Copy(irFrame.Data,irByte,0,irFrame.DataSize);
-    
-    //var irImg = Image.Load(irByte);
+
     var irImg = Image.LoadPixelData<L8>(irByte,irFrame.Width,irFrame.Height);
-    
     WriteLine("depthFrame:Height:{0},Width:{1}",irImg.Height,irImg.Width);
     
     irImg.Save("./pic/irImg.jpg");
-    //Bitmap newImage = new Bitmap(irImg);
-    //newImage.Save("./pic/ir.png",System.Drawing.Imaging.ImageFormat.Png);
     WriteLine("irFrame:Height:{0},Width:{1}",irFrame.Height,irFrame.Width);
 
     
