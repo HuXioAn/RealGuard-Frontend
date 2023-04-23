@@ -32,14 +32,44 @@ PipelineProfile selection = pipe.Start(config);
 var selected_device = selection.Device;
 var depth_sensor = selected_device.Sensors[0];
 
+
+
 if (depth_sensor.Options.Supports(Option.EmitterEnabled))
 {
-    depth_sensor.Options[Option.EmitterEnabled].Value = 0f; // Enable emitter
-    //depth_sensor.Options[Option.EmitterEnabled].Value = 0f; // Disable emitter
-    // Thread.Sleep(1000);
-    // depth_sensor.Options[Option.EmitterEnabled].Value = 0f; // Disable emitter
-    // Thread.Sleep(1000);
-    // depth_sensor.Options[Option.EmitterEnabled].Value = 1f;
+    depth_sensor.Options[Option.EmitterEnabled].Value = 0f; // Disable emitter
+    //Thread.Sleep(150);//Time to react
+}
+
+using(var frames = pipe.WaitForFrames()){
+    
+
+
+
+    var irFrame = frames.InfraredFrame.DisposeWith(frames);
+
+    var irByte = new byte[irFrame.DataSize];
+    Marshal.Copy(irFrame.Data,irByte,0,irFrame.DataSize);
+
+    var irImg = Image.LoadPixelData<L8>(irByte,irFrame.Width,irFrame.Height);
+    WriteLine("depthFrame:Height:{0},Width:{1}",irImg.Height,irImg.Width);
+    
+    irImg.Save("./pic/irImg.jpg");
+    WriteLine("irFrame:Height:{0},Width:{1}",irFrame.Height,irFrame.Width);
+
+    
+
+}
+
+
+
+
+
+
+
+if (depth_sensor.Options.Supports(Option.EmitterEnabled))
+{
+    depth_sensor.Options[Option.EmitterEnabled].Value = 1f; // Enable emitter
+    Thread.Sleep(150); // time to react
 }
 
 Colorizer color_map = new Colorizer();
@@ -61,17 +91,9 @@ using(var frames = pipe.WaitForFrames()){
 
 
 
-    var irFrame = frames.InfraredFrame.DisposeWith(frames);
-
-    var irByte = new byte[irFrame.DataSize];
-    Marshal.Copy(irFrame.Data,irByte,0,irFrame.DataSize);
-
-    var irImg = Image.LoadPixelData<L8>(irByte,irFrame.Width,irFrame.Height);
-    WriteLine("depthFrame:Height:{0},Width:{1}",irImg.Height,irImg.Width);
-    
-    irImg.Save("./pic/irImg.jpg");
-    WriteLine("irFrame:Height:{0},Width:{1}",irFrame.Height,irFrame.Width);
 
     
 
 }
+
+
