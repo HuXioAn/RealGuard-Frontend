@@ -47,13 +47,37 @@ using(var frames = pipe.WaitForFrames()){
 
     var irFrame = frames.InfraredFrame.DisposeWith(frames);
 
-    var irByte = new byte[irFrame.DataSize];
-    Marshal.Copy(irFrame.Data,irByte,0,irFrame.DataSize);
-
-    var irImg = Image.LoadPixelData<L8>(irByte,irFrame.Width,irFrame.Height);
-    WriteLine("depthFrame:Height:{0},Width:{1}",irImg.Height,irImg.Width);
+    var irByteL = new byte[irFrame.DataSize];
+    var irByteR = new byte[irFrame.DataSize];
     
-    irImg.Save("./pic/irImg.jpg");
+    Marshal.Copy(irFrame.Data,irByteL,0,irFrame.DataSize);//左
+
+    
+    IntPtr rightFrame = irFrame.Data+irFrame.DataSize;
+    var irByteCheck = new byte[64];
+    Marshal.Copy(rightFrame,irByteCheck,0,64);//左
+
+
+    if(0 == irByteCheck[63] && 1 == irByteCheck[61]){
+        Marshal.Copy(rightFrame+64,irByteR,0,irFrame.DataSize);//右
+    }else if(0 == irByteCheck[31] && 1 == irByteCheck[29]){
+        Marshal.Copy(rightFrame+32,irByteR,0,irFrame.DataSize);//右
+    }else{
+        Marshal.Copy(rightFrame,irByteR,0,irFrame.DataSize);//右
+    }
+    
+    //Marshal.Copy(irFrame.Data,irByte,0,irFrame.DataSize*2);
+
+
+    var irImgL = Image.LoadPixelData<L8>(irByteL,irFrame.Width,irFrame.Height);
+    var irImgR = Image.LoadPixelData<L8>(irByteR,irFrame.Width,irFrame.Height);
+
+    //var irImgRight = Image.Load<L8>(irByte[irFrame.DataSize],irFrame.Width,irFrame.Height)
+    WriteLine("depthFrame:Height:{0},Width:{1}",irImgL.Height,irImgL.Width);
+    
+    irImgL.Save("./pic/irImgL.jpg");
+    irImgR.Save("./pic/irImgR.jpg");
+
     WriteLine("irFrame:Height:{0},Width:{1}",irFrame.Height,irFrame.Width);
 
     
