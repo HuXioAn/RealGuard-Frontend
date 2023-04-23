@@ -12,7 +12,7 @@ namespace rpc{
         static public void Main(){
 
             // The port number must match the port of the gRPC server.
-            using var channel = GrpcChannel.ForAddress("http://localhost:5141");
+            using var channel = GrpcChannel.ForAddress("http://localhost:50051");
             var client = new auth.authClient(channel);
 
 
@@ -29,16 +29,16 @@ namespace rpc{
             var depth = d430.getDepthData();
 
 
-
-            var reply = client.do_auth(
-                            new auth_request { 
+            var request = new auth_request { 
                                 TimeStamp = (UInt64)DateTime.Now.Subtract(DateTime.UnixEpoch).TotalSeconds,
                                 IrImg = Google.Protobuf.ByteString.CopyFrom(File.ReadAllBytes("./pic/irImg.jpg")),
                                 DepthData = Google.Protobuf.ByteString.CopyFrom(depth)
-                                });
+                                };
+
+            var reply = client.do_auth(request);
 
             
-            WriteLine("Status:{},Result:{}",reply.Status,reply.Result);
+            WriteLine("Status:{0},Result:{1}",reply.Status,reply.Result);
             WriteLine("Press any key to close");
             ReadKey();
 
