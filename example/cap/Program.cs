@@ -33,7 +33,6 @@ var selected_device = selection.Device;
 var depth_sensor = selected_device.Sensors[0];
 
 
-
 if (depth_sensor.Options.Supports(Option.EmitterEnabled))
 {
     depth_sensor.Options[Option.EmitterEnabled].Value = 0f; // Disable emitter
@@ -57,14 +56,18 @@ using(var frames = pipe.WaitForFrames()){
     var irByteCheck = new byte[64];
     Marshal.Copy(rightFrame,irByteCheck,0,64);//左
 
-
-    if(0 == irByteCheck[63] && 1 == irByteCheck[61]){
-        Marshal.Copy(rightFrame+64,irByteR,0,irFrame.DataSize);//右
-    }else if(0 == irByteCheck[31] && 1 == irByteCheck[29]){
-        Marshal.Copy(rightFrame+32,irByteR,0,irFrame.DataSize);//右
-    }else{
-        Marshal.Copy(rightFrame,irByteR,0,irFrame.DataSize);//右
+    try{
+        if(0 == irByteCheck[63] && 0 == irByteCheck[62]){
+            Marshal.Copy(rightFrame+64,irByteR,0,irFrame.DataSize);//右
+        }else if(0 == irByteCheck[31] && 0 == irByteCheck[30]){
+            Marshal.Copy(rightFrame+32,irByteR,0,irFrame.DataSize);//右
+        }else{
+            Marshal.Copy(rightFrame,irByteR,0,irFrame.DataSize);//右
+        }
+    }catch(Exception e){
+        WriteLine("{0}",BitConverter.ToString(irByteCheck));
     }
+    
     
     //Marshal.Copy(irFrame.Data,irByte,0,irFrame.DataSize*2);
 
