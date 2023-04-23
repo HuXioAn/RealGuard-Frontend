@@ -9,12 +9,11 @@ using realSense;
 
 namespace rpc{
     public class exampleRPC{
-        static public void Main(){
+        static public async void Main(){
 
             // The port number must match the port of the gRPC server.
             using var channel = GrpcChannel.ForAddress("http://localhost:50051");
             var client = new auth.authClient(channel);
-
 
 
             var d430 = new realSense.realSense();
@@ -35,7 +34,7 @@ namespace rpc{
                                 DepthData = Google.Protobuf.ByteString.CopyFrom(depth)
                                 };
 
-            var reply = client.do_auth(request);
+            var reply = await client.do_authAsync(request);
 
             
             WriteLine("Status:{0},Result:{1}",reply.Status,reply.Result);
