@@ -14,7 +14,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <Protobuf Include="Protos\greet.proto" GrpcServices="Client" />
+    <PackageReference Include="Intel.RealSenseWithNativeDll" Version="2.51.1.1" />
+    <PackageReference Include="librealsense.x64" Version="2.45.1" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
+    <Protobuf Include="Protos\realGuard.proto" GrpcServices="Client" />
   </ItemGroup>
 
 </Project>
