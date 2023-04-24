@@ -22,7 +22,7 @@ while (true)
     ioController.gateIoSet(false);
     Thread.Sleep(1000);
 
-    WriteLine("Pin:level{1}",ioController.bodySensorRead());
+    WriteLine("Pin:level{0}",ioController.bodySensorRead());
 
     
 }
