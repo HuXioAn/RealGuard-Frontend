@@ -30,7 +30,11 @@ namespace realGuardGpio{
             controller.Write(gateSwitchPin,level?PinValue.High:PinValue.Low);
         }
 
-        public void bodySensorCb(bool edge,Action<object,PinValueChangedEventArgs> callback){
+        public bool bodySensorRead(){
+            return controller.Read(bodySensorPin) == PinValue.High ? true : false;
+        }
+
+        public void bodySensorCallbackRegister(bool edge,Action<object,PinValueChangedEventArgs> callback){
             sensorDelegate = new PinChangeEventHandler(callback);
             controller.RegisterCallbackForPinValueChangedEvent(bodySensorPin,edge?PinEventTypes.Rising:PinEventTypes.Falling,sensorDelegate);
         }
