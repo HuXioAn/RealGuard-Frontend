@@ -41,9 +41,9 @@ namespace realGuardFrontEnd{
                     irImg.Save(filePath);
 
                     WriteLine("Requiring BackEnd.");
-                    var reply = rpcClient!.authRequstAsync(filePath,depthData);
-
-                    WriteLine("Status:{0},Result:{1}",reply.Status,reply.Result);
+                    var replyTask = rpcClient!.authRequstAsync(filePath,depthData);
+                    var reply = replyTask.Result;
+                    WriteLine("Status:{0},Result:{1},name:{2}",reply.Status,reply.Result,reply.Name);
 
                     
 
