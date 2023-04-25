@@ -52,7 +52,7 @@ namespace realSense{
             if (laser.Options.Supports(Option.EmitterEnabled))
                 {
                     laser.Options[Option.EmitterEnabled].Value = 1f; // Disable emitter
-                    Thread.Sleep(150);//Time to react
+                    Thread.Sleep(300);//Time to react
                 }
         }
 
