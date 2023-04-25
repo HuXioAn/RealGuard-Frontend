@@ -77,6 +77,7 @@ namespace realGuardFrontEnd{
             
 
             ioController.gateIoSet(false);
+            cam.laserOff();
 
             
         }
