@@ -46,6 +46,13 @@ namespace realGuardFrontEnd{
                     var reply = replyTask.Result;
                     WriteLine("Status:{0},Result:{1},name:{2}",reply.Status,reply.Result,reply.Name);
 
+                    if(reply.Status == 100){
+                        //pass
+                        ioController.gateIoSet(true);
+                        Thread.Sleep(1000);
+                        ioController.gateIoSet(false);
+                    }
+
 
                 }
 
