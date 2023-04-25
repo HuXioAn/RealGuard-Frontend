@@ -39,6 +39,10 @@ namespace realGuardGpio{
             controller.RegisterCallbackForPinValueChangedEvent(bodySensorPin,edge?PinEventTypes.Rising:PinEventTypes.Falling,sensorDelegate);
         }
 
+        public bool bodySensorEventWait(bool edge){
+            return controller.WaitForEvent(bodySensorPin,edge?PinEventTypes.Rising:PinEventTypes.Falling,new TimeSpan(days:1,0,0,0)).TimedOut;
+        }
+
     }
 
 
