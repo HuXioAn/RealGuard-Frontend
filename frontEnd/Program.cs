@@ -25,18 +25,22 @@ namespace realGuardFrontEnd{
 
                 while(true){
                     //业务逻辑
-                    while(ioController!.bodySensorEventWait(true));
+                    //while(ioController!.bodySensorEventWait(true));
+                    Thread.Sleep(3000);
 
                     //人体触发
                     cam!.laserOff();
                     Thread.Sleep(500);
+                    WriteLine("Fetching IR Image.");
                     var irImg = cam.getIrImg();
                     cam.laserOn();
+                    WriteLine("Fetching Depth Data.");
                     var depthData = cam.getDepthData();
 
                     var filePath = string.Format("./pic/irImg_{0}.jpg",(UInt64)DateTime.Now.Subtract(DateTime.UnixEpoch).TotalSeconds);
                     irImg.Save(filePath);
 
+                    WriteLine("Requiring BackEnd.");
                     var reply = rpcClient!.authRequstAsync(filePath,depthData);
 
                     WriteLine("Status:{0},Result:{1}",reply.Status,reply.Result);
