@@ -25,17 +25,16 @@ namespace realGuardFrontEnd{
 
                 while(true){
                     //业务逻辑
-                    while(ioController!.bodySensorEventWait(true));
-                    //Thread.Sleep(3000);
+                    while(!ioController!.bodySensorRead());
+                    Thread.Sleep(500);
                     WriteLine("Body Triggered");
                     //人体触发
-                    cam!.laserOff();
-                    Thread.Sleep(500);
                     WriteLine("Fetching IR Image.");
-                    var irImg = cam.getIrImg();
+                    var irImg = cam!.getIrImg();
                     cam.laserOn();
                     WriteLine("Fetching Depth Data.");
                     var depthData = cam.getDepthData();
+                    cam.laserOff();
 
                     var filePath = string.Format("./pic/irImg_{0}.jpg",(UInt64)DateTime.Now.Subtract(DateTime.UnixEpoch).TotalSeconds);
                     irImg.Save(filePath);
@@ -45,13 +44,10 @@ namespace realGuardFrontEnd{
                     var reply = replyTask.Result;
                     WriteLine("Status:{0},Result:{1},name:{2}",reply.Status,reply.Result,reply.Name);
 
-                    
-
 
                 }
 
                 //资源回收善后
-
 
             }
 
