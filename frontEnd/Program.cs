@@ -25,9 +25,9 @@ namespace realGuardFrontEnd{
 
                 while(true){
                     //业务逻辑
-                    //while(ioController!.bodySensorEventWait(true));
-                    Thread.Sleep(3000);
-
+                    while(ioController!.bodySensorEventWait(true));
+                    //Thread.Sleep(3000);
+                    WriteLine("Body Triggered");
                     //人体触发
                     cam!.laserOff();
                     Thread.Sleep(500);
