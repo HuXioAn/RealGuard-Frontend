@@ -43,6 +43,12 @@ namespace realGuardGpio{
             return controller.WaitForEvent(bodySensorPin,edge?PinEventTypes.Rising:PinEventTypes.Falling,new TimeSpan(days:1,0,0,0)).TimedOut;
         }
 
+        public async void openGateAsync(){
+            this.gateIoSet(true);
+            await Task.Delay(500);
+            this.gateIoSet(false);
+        }
+
     }
 
 

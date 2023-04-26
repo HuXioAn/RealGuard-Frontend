@@ -15,7 +15,7 @@ namespace realGuardFrontEnd{
 
         private static string rpcAddress = "http://localhost:5051";
 
-        public static void Main(){
+        public static async void Main(){
 
             while(true){
 
@@ -33,13 +33,13 @@ namespace realGuardFrontEnd{
                     //人体触发
                     WriteLine("Fetching IR Image.");
                     var irImg = cam!.getIrImg();
-                    cam.laserOn();
-                    WriteLine("Fetching Depth Data.");
-                    var depthData = cam.getDepthData();
-                    cam.laserOff();
-
+                    var onTask = cam.laserOnAsync();
                     var filePath = string.Format("./pic/irImg_{0}.jpg",(UInt64)DateTime.Now.Subtract(DateTime.UnixEpoch).TotalSeconds);
                     irImg.Save(filePath);
+                    await onTask;
+                    WriteLine("Fetching Depth Data.");
+                    var depthData = cam.getDepthData();
+                    var offTask = cam.laserOffAsync();
 
                     WriteLine("Requiring BackEnd.");
                     var replyTask = rpcClient!.authRequstAsync(filePath,depthData);
@@ -48,9 +48,7 @@ namespace realGuardFrontEnd{
 
                     if(reply.Status == 100){
                         //pass
-                        ioController.gateIoSet(true);
-                        Thread.Sleep(1000);
-                        ioController.gateIoSet(false);
+                        ioController.openGateAsync();
                     }
 
 

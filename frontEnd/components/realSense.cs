@@ -56,11 +56,27 @@ namespace realSense{
                 }
         }
 
+        public async Task laserOnAsync(){
+            if (laser.Options.Supports(Option.EmitterEnabled))
+                {
+                    laser.Options[Option.EmitterEnabled].Value = 1f; // Disable emitter
+                    await Task.Delay(250);//Time to react
+                }
+        }
+
         public void laserOff(){
             if (laser.Options.Supports(Option.EmitterEnabled))
                 {
                     laser.Options[Option.EmitterEnabled].Value = 0f; // Disable emitter
                     Thread.Sleep(150);//Time to react
+                }
+        }
+
+        public async Task laserOffAsync(){
+            if (laser.Options.Supports(Option.EmitterEnabled))
+                {
+                    laser.Options[Option.EmitterEnabled].Value = 0f; // Disable emitter
+                    await Task.Delay(150);//Time to react
                 }
         }
 
