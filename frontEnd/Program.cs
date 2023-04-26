@@ -15,7 +15,7 @@ namespace realGuardFrontEnd{
 
         private static string rpcAddress = "http://localhost:5051";
 
-        public static async void Main(){
+        public static void Main(){
 
             while(true){
 
@@ -29,29 +29,52 @@ namespace realGuardFrontEnd{
                         Thread.Sleep(100);
                     }
                     Thread.Sleep(500);
-                    WriteLine("Body Triggered");
-                    //人体触发
+                    WriteLine("Body Triggered");//人体触发
+
                     WriteLine("Fetching IR Image.");
                     var irImg = cam!.getIrImg();
                     var onTask = cam.laserOnAsync();
                     var filePath = string.Format("./pic/irImg_{0}.jpg",(UInt64)DateTime.Now.Subtract(DateTime.UnixEpoch).TotalSeconds);
                     irImg.Save(filePath);
-                    await onTask;
+                    onTask.Wait();
                     WriteLine("Fetching Depth Data.");
                     var depthData = cam.getDepthData();
                     var offTask = cam.laserOffAsync();
 
-                    WriteLine("Requiring BackEnd.");
-                    var replyTask = rpcClient!.authRequstAsync(filePath,depthData);
-                    var reply = replyTask.Result;
-                    WriteLine("Status:{0},Result:{1},name:{2}",reply.Status,reply.Result,reply.Name);
+                        
+                    while(true){
 
-                    if(reply.Status == 100){
-                        //pass
-                        ioController.openGateAsync();
+                        WriteLine("Requiring BackEnd.");
+                        var replyTask = rpcClient!.authRequstAsync(filePath,depthData);
+                        
+                        //后端请求异步采集
+                        offTask.Wait();
+                        WriteLine("Fetching IR Image.");
+                        irImg = cam!.getIrImg();
+                        onTask = cam.laserOnAsync();
+
+                        filePath = string.Format("./pic/irImg_{0}.jpg",(UInt64)DateTime.Now.Subtract(DateTime.UnixEpoch).TotalSeconds);
+                        irImg.Save(filePath);
+
+                        onTask.Wait();
+                        WriteLine("Fetching Depth Data.");
+                        depthData = cam.getDepthData();
+                        offTask = cam.laserOffAsync();
+
+                        
+                        replyTask.Wait();
+                        var reply = replyTask.Result;
+                        WriteLine("Status:{0},Result:{1},name:{2}",reply.Status,reply.Result,reply.Name);
+
+                        if(reply.Status == 100){
+                            //pass
+                            ioController.openGateAsync();
+                            break;
+                        }
+                        if(!ioController.bodySensorRead())break;//失败且无人，取消继续检测
+
                     }
-
-
+                    
                 }
 
                 //资源回收善后
