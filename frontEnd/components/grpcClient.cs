@@ -41,6 +41,7 @@ namespace grpcClient{
 
 
         public async Task<auth_result> authRequstAsync(Stream irImgStream, byte[] depthData){
+            irImgStream.Seek(0,SeekOrigin.Begin);
             var request = new auth_request { 
                                 TimeStamp = (UInt64)DateTime.Now.Subtract(DateTime.UnixEpoch).TotalSeconds,
                                 IrImg = Google.Protobuf.ByteString.FromStream(irImgStream),
