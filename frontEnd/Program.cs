@@ -73,7 +73,13 @@ namespace realGuardFrontEnd{
                         if(reply.Status == 100){
                             //pass
                             ioController.openGateAsync();
-                            using(var imageFileStream = File.Create("./pic/"+reply.Name+"_"+DateTime.Now.ToLongTimeString()+".jpg")){
+                            //识别成功图片保存
+                            using(var imageFileStream = File.Create("./pic/"+reply.Name
+                            +"_"
+                            +reply.Result.ToString()
+                            +"_"
+                            +DateTime.Now.Subtract(DateTime.UnixEpoch).TotalSeconds.ToString()
+                            +".jpg")){
                                 irImgStreamToRequest.Seek(0,SeekOrigin.Begin);
                                 irImgStreamToRequest.CopyToAsync(imageFileStream);
                             }
