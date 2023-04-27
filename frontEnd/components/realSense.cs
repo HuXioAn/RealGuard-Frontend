@@ -91,6 +91,18 @@ namespace realSense{
         }
 
 
+        public void getIrImgStream(System.IO.Stream irImgStream){
+            irImgStream.Seek(0,SeekOrigin.Begin);
+            using(var frames = pipe.WaitForFrames()){
+                var irFrame = frames.InfraredFrame.DisposeWith(frames);
+                var irByte = new byte[irFrame.DataSize];
+                Marshal.Copy(irFrame.Data,irByte,0,irFrame.DataSize);
+                Image.LoadPixelData<L8>(irByte,irFrame.Width,irFrame.Height).Save(irImgStream,new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder());
+
+            }
+        }
+
+
         public byte[] getDepthData(){
              using(var frames = pipe.WaitForFrames()){
     

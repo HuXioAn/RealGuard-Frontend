@@ -38,6 +38,21 @@ namespace grpcClient{
             }
             
         }
+
+
+        public async Task<auth_result> authRequstAsync(Stream irImgStream, byte[] depthData){
+            var request = new auth_request { 
+                                TimeStamp = (UInt64)DateTime.Now.Subtract(DateTime.UnixEpoch).TotalSeconds,
+                                IrImg = Google.Protobuf.ByteString.FromStream(irImgStream),
+                                DepthData = Google.Protobuf.ByteString.CopyFrom(depthData)
+                                };
+            try{
+                return await client.do_authAsync(request);
+            }catch(Exception e){
+                throw new Exception("Error talking to backend:"+e.Message);
+            }
+            
+        }
     
 
     

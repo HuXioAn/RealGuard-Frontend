@@ -32,10 +32,13 @@ namespace realGuardFrontEnd{
                     WriteLine("Body Triggered");//人体触发
 
                     WriteLine("Fetching IR Image.");
-                    var irImg = cam!.getIrImg();
+                    var irImgStream = new MemoryStream();
+                    var irImgStreamToRequest = new MemoryStream();
+
+                    cam!.getIrImgStream(irImgStream);
                     var onTask = cam.laserOnAsync();
-                    var filePath = string.Format("./pic/irImg_{0}.jpg",(UInt64)DateTime.Now.Subtract(DateTime.UnixEpoch).TotalSeconds);
-                    irImg.Save(filePath);
+
+                    //var filePath = string.Format("./pic/irImg_{0}.jpg",(UInt64)DateTime.Now.Subtract(DateTime.UnixEpoch).TotalSeconds);
                     onTask.Wait();
                     WriteLine("Fetching Depth Data.");
                     var depthData = cam.getDepthData();
@@ -43,18 +46,18 @@ namespace realGuardFrontEnd{
 
                         
                     while(true){
+                        
+                        irImgStreamToRequest.Seek(0,SeekOrigin.Begin);
+                        irImgStream.CopyTo(irImgStreamToRequest);
 
                         WriteLine("Requiring BackEnd.");
-                        var replyTask = rpcClient!.authRequstAsync(filePath,depthData);
+                        var replyTask = rpcClient!.authRequstAsync(irImgStreamToRequest,depthData);
                         
                         //后端请求异步采集
                         offTask.Wait();
                         WriteLine("Fetching IR Image.");
-                        irImg = cam!.getIrImg();
+                        cam!.getIrImgStream(irImgStream);
                         onTask = cam.laserOnAsync();
-
-                        filePath = string.Format("./pic/irImg_{0}.jpg",(UInt64)DateTime.Now.Subtract(DateTime.UnixEpoch).TotalSeconds);
-                        irImg.Save(filePath);
 
                         onTask.Wait();
                         WriteLine("Fetching Depth Data.");
@@ -69,6 +72,10 @@ namespace realGuardFrontEnd{
                         if(reply.Status == 100){
                             //pass
                             ioController.openGateAsync();
+                            using(var imageFileStream = File.Create("./pic/"+reply.Name+"_"+DateTime.Now.ToLongTimeString()+".jpg")){
+                                irImgStreamToRequest.Seek(0,SeekOrigin.Begin);
+                                irImgStreamToRequest.CopyToAsync(imageFileStream);
+                            }
                             break;
                         }
                         if(!ioController.bodySensorRead())break;//失败且无人，取消继续检测
