@@ -48,6 +48,7 @@ namespace realGuardFrontEnd{
                     while(true){
                         
                         irImgStreamToRequest.Seek(0,SeekOrigin.Begin);
+                        irImgStream.Seek(0,SeekOrigin.Begin);
                         irImgStream.CopyTo(irImgStreamToRequest);
 
                         WriteLine("Requiring BackEnd.");
