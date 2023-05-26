@@ -11,6 +11,7 @@ namespace realWebSocketServer
 
         private List<IWebSocketConnection> aliveList =  new List<IWebSocketConnection>();
         private List<IWebSocketConnection> authList =  new List<IWebSocketConnection>();
+        private string? currentToken = null;
         private WebSocketServer? wsServer;
 
         private string wsAddress;
@@ -48,8 +49,35 @@ namespace realWebSocketServer
             if(!authList.Contains(socket)){
                 //未认证 只能认证
 
+                if(wsServiceAuth(msg)){
+                    //pass
+                    
+                    //reply 下发token
+
+                    authList.Add(socket);
+                }else{
+                    //fail
+                    //reply
+
+                }
             }else{
                 //已认证
+                var request = wsRequestParse(msg);
+                if(null == request)return;
+
+                //check token
+
+
+                switch (request.request)
+                {
+                    case "" :
+
+                    break;
+
+                    default:
+
+                    break;
+                }
 
             }
         }
@@ -61,6 +89,28 @@ namespace realWebSocketServer
 
             return false;
         }
+
+
+        private wsRequest? wsRequestParse(string requestStr){
+            //用于首先解析行为
+            var request = JsonSerializer.Deserialize<wsRequest>(requestStr);
+            if(request != null)return request;
+            else
+            return null;
+        }
+
+        public string wsTokenGen(){
+            if(authList.Count() == 0){
+                //gen new
+
+                ;
+            }else{
+                //return old 
+                if(currentToken != null)return currentToken;
+                else throw new Exception("[!]Token error");
+            }
+        }
+
 
 
     }
