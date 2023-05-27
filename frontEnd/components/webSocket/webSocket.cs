@@ -3,6 +3,7 @@ using System;
 using static System.Console;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using realGuardFrontEnd;
 
 
 namespace realWebSocketServer
@@ -15,6 +16,11 @@ namespace realWebSocketServer
         private WebSocketServer? wsServer;
 
         private string wsAddress;
+
+        public bool registering = false;
+
+        private string registerName = "";
+        private string registerId = "";
 
         public realWebSocketServer(string address){
             wsAddress = address;
@@ -49,16 +55,34 @@ namespace realWebSocketServer
             if(!authList.Contains(socket)){
                 //未认证 只能认证
 
+                var request = wsRequestParse(msg);
+                if(null == request)return;
+
                 if(wsServiceAuth(msg)){
                     //pass
                     
                     //reply 下发token
-
+                    var token = wsTokenGen();
+                    var authReply = new wsReplyAuth{
+                        state = "authOk",
+                        requestId = request.requestId,
+                        username = "focus_realguard",
+                        token = token
+                    };
+                    var authReplyAuth = JsonSerializer.Serialize<wsReplyAuth>(authReply);
+                    socket.Send(authReplyAuth);
                     authList.Add(socket);
                 }else{
                     //fail
                     //reply
-
+                    var authReply = new wsReplyAuth{
+                        state = "authFail",
+                        requestId = request.requestId,
+                        username = "",
+                        token = ""
+                    };
+                    var authReplyJson = JsonSerializer.Serialize<wsReplyAuth>(authReply);
+                    socket.Send(authReplyJson);
                 }
             }else{
                 //已认证
@@ -66,17 +90,86 @@ namespace realWebSocketServer
                 if(null == request)return;
 
                 //check token
-
+                if(!wsTokenCheck(request.token!))return;
 
                 switch (request.request)
                 {
-                    case "" :
+                    case "register" :
+                        if(registering == true)return;
+                        
+                        var registerRequest = JsonSerializer.Deserialize<wsRequestRegister>(msg);
+                        if(registerRequest == null)return;
 
-                    break;
+                        registering = true;
+                        registerName = registerRequest.name;
+                        registerId = registerRequest.studentId;
+
+                        var registerReply = new wsReplyRegister{
+                            state = "ready",
+                            requestId = request.requestId,
+                            name = registerName
+                        };
+                        var registerReplyJson = JsonSerializer.Serialize<wsReplyRegister>(registerReply);
+                        socket.Send(registerReplyJson);
+
+                        break;
+                    case "snap" :
+                        if(registering == false)return;
+
+                        var snapRequest = JsonSerializer.Deserialize<wsRequestSnap>(msg);
+                        if(snapRequest == null)return;
+
+                        //snap
+                        var picStream = realGuardFrontEnd.frontEnd.snap();
+                        //check the pic with backend
+                        var dist = realGuardFrontEnd.frontEnd.registerCheck(picStream, registerName, registerId);
+
+                        //stream -> base64
+                        var picByte = new byte[picStream.Length];
+                        if(picStream.Read(picByte, 0, picByte.Length) > 0){
+                            var picBase64 = Convert.ToBase64String(picByte);
+                        }else return;
+                        
+                 
+
+                        break;
+                    case "check" :
+                        if(registering == false)return;
+
+                        var checkRequest = JsonSerializer.Deserialize<wsRequestCheck>(msg);
+                        if(checkRequest == null)return;
+
+                        //check
+
+
+                        var checkReply = new wsReplyCheck{
+                            state = "ok",
+                            requestId = request.requestId,
+                            picId = checkRequest.picId,
+                            result = checkRequest.result
+                        };
+                        var checkReplyJson = JsonSerializer.Serialize<wsReplyCheck>(checkReply);
+                        socket.Send(checkReplyJson);
+
+                        break;
+
+                    case "over" :
+                        if(registering == false)return;
+
+                        registering = false;
+                        
+                        var overReply = new wsReplyOver{
+                            state = "over",
+                            requestId = request.requestId,
+                        };
+                        var overReplyJson = JsonSerializer.Serialize<wsReplyOver>(overReply);
+                        socket.Send(overReplyJson);
+
+                        break;
 
                     default:
-
-                    break;
+                        return;
+                    
                 }
 
             }
@@ -84,11 +177,28 @@ namespace realWebSocketServer
 
         private bool wsServiceAuth(string msg){
 
+            var request = wsRequestParse(msg);
+            if(null == request)return false;
 
+            if(request.request != "auth")return false;
+            else{
+                var authRequest = JsonSerializer.Deserialize<wsRequestAuth>(msg);
+                if(null == authRequest)return false;
+
+                if(authRequest.username == "focus_realguard" && authRequest.password == "crazy_thursday")
+                return true;
+                else return false;
+
+            }
 
 
             return false;
         }
+
+
+
+
+
 
 
         private wsRequest? wsRequestParse(string requestStr){
@@ -100,15 +210,22 @@ namespace realWebSocketServer
         }
 
         public string wsTokenGen(){
-            if(authList.Count() == 0){
-                //gen new
+            // if(authList.Count() == 0){
+            //     //gen new
 
-                ;
-            }else{
-                //return old 
-                if(currentToken != null)return currentToken;
-                else throw new Exception("[!]Token error");
-            }
+            //     ;
+            // }else{
+            //     //return old 
+            //     if(currentToken != null)return currentToken;
+            //     else throw new Exception("[!]Token error");
+            // }
+            return "huxiaoan";
+        }
+
+        public bool wsTokenCheck(string token){
+
+            if(token == "huxiaoan")return true;
+            else return false;
         }
 
 

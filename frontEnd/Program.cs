@@ -3,6 +3,7 @@ using static System.Console;
 using realSense;
 using grpcClient;
 using realGuardGpio;
+using realWebSocketServer;
 
 
 
@@ -15,6 +16,10 @@ namespace realGuardFrontEnd{
 
         private static string rpcAddress = "http://localhost:5051";
 
+        private static string wsAddress = "ws://localhost:5050";
+
+        //public static bool registerFlag = false;
+
         public static void Main(){
 
             while(true){
@@ -23,9 +28,11 @@ namespace realGuardFrontEnd{
 
                 systemInit(rpcAddress);
 
+                var wsServer = new realWebSocketServer.realWebSocketServer(wsAddress);
+
                 while(true){
                     //业务逻辑
-                    while(!ioController!.bodySensorRead()){
+                    while((!ioController!.bodySensorRead()) || wsServer.registering == true){
                         Thread.Sleep(100);
                     }
                     Thread.Sleep(500);
@@ -118,6 +125,27 @@ namespace realGuardFrontEnd{
         }
 
 
+        public static MemoryStream snap(){
+
+            //拍照、查询后端、返回照片
+            cam!.laserOff();
+            var irImgStream = new MemoryStream();
+            cam!.getIrImgStream(irImgStream);
+            
+            return irImgStream;
+        }
+
+        public static float register(MemoryStream picStream, string name, string studentId){
+            //采纳照片
+
+            return -1;
+        }
+
+        public static float registerCheck(MemoryStream picStream, string name, string studentId){
+            //验证照片
+
+            return -1;
+        }
 
     }
 

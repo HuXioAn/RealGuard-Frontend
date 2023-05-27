@@ -18,6 +18,7 @@ namespace realWebSocketServer{
 
 
     public class wsReplyAuth : wsReply{
+        //state: authOk authFail
         public string username{set; get;}
         public string token{set; get;}
 
@@ -25,6 +26,7 @@ namespace realWebSocketServer{
 
 
     public class wsReplyRegister : wsReply{
+        //state: ready
         public string name{set; get;}
     }
 
@@ -36,13 +38,14 @@ namespace realWebSocketServer{
     }
 
     public class wsReplyCheck : wsReply{
+        //state : ok
         public int picId{set; get;}
         public string result{set; get;}
     }
 
 
     public class wsReplyOver : wsReply{
-        
+        //state : over
     }
 
 
