@@ -32,13 +32,15 @@ namespace realWebSocketServer{
 
 
     public class wsReplySnap : wsReply{
+        //state: ok fail
+        //base64 : picBase64 errMsg
         public string picBase64{set; get;}
         public int picId{set; get;}
         public float dist{set; get;}
     }
 
     public class wsReplyCheck : wsReply{
-        //state : ok
+        //state : ok fail
         public int picId{set; get;}
         public string result{set; get;}
     }

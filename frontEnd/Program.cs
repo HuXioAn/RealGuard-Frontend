@@ -138,13 +138,14 @@ namespace realGuardFrontEnd{
         public static float register(MemoryStream picStream, string name, string studentId){
             //采纳照片
 
-            return -1;
+            return rpcClient!.registerRequest(picStream, name, studentId, true);
+
         }
 
         public static float registerCheck(MemoryStream picStream, string name, string studentId){
             //验证照片
+            return rpcClient!.registerRequest(picStream, name, studentId, false);
 
-            return -1;
         }
 
     }

@@ -12,7 +12,6 @@ namespace realWebSocketServer
 
         private List<IWebSocketConnection> aliveList =  new List<IWebSocketConnection>();
         private List<IWebSocketConnection> authList =  new List<IWebSocketConnection>();
-        private string? currentToken = null;
         private WebSocketServer? wsServer;
 
         private string wsAddress;
@@ -21,6 +20,8 @@ namespace realWebSocketServer
 
         private string registerName = "";
         private string registerId = "";
+        private int picId = 0;
+        private MemoryStream? picToCheck = null;
 
         public realWebSocketServer(string address){
             wsAddress = address;
@@ -28,6 +29,7 @@ namespace realWebSocketServer
             
             wsServer.Start(socket => {
                 socket.OnOpen = () => {
+                    if(aliveList.Count() == 0)registerFlagClear();
                     aliveList.Add(socket);
                 };
                 socket.OnMessage = (message) => {
@@ -36,11 +38,14 @@ namespace realWebSocketServer
                 socket.OnClose = () => 
                 {
                     aliveList.Remove(socket);
+                    
                     if(authList.Contains(socket))authList.Remove(socket);
+                    registerFlagClear();
                 };
                 socket.OnError = (e) => {
                     aliveList.Remove(socket);
                     if(authList.Contains(socket))authList.Remove(socket);
+                    registerFlagClear();
                     Console.WriteLine("[!]WS Server error: "+e.Message+" CLOSED!");
                 };
             });
@@ -96,14 +101,16 @@ namespace realWebSocketServer
                 {
                     case "register" :
                         if(registering == true)return;
-                        
+                        //parse
                         var registerRequest = JsonSerializer.Deserialize<wsRequestRegister>(msg);
                         if(registerRequest == null)return;
 
                         registering = true;
                         registerName = registerRequest.name;
                         registerId = registerRequest.studentId;
+                        picId = 0;
 
+                        //reply
                         var registerReply = new wsReplyRegister{
                             state = "ready",
                             requestId = request.requestId,
@@ -115,48 +122,102 @@ namespace realWebSocketServer
                         break;
                     case "snap" :
                         if(registering == false)return;
-
+                        //parse
                         var snapRequest = JsonSerializer.Deserialize<wsRequestSnap>(msg);
                         if(snapRequest == null)return;
 
-                        //snap
-                        var picStream = realGuardFrontEnd.frontEnd.snap();
-                        //check the pic with backend
-                        var dist = realGuardFrontEnd.frontEnd.registerCheck(picStream, registerName, registerId);
+                        try{
+                            //snap
+                            var picStream = realGuardFrontEnd.frontEnd.snap();
+                            //check the pic with backend
+                            var dist = realGuardFrontEnd.frontEnd.registerCheck(picStream, registerName, registerId);
+                            if(dist < 0)throw new Exception("Error taking picture");
 
-                        //stream -> base64
-                        var picByte = new byte[picStream.Length];
-                        if(picStream.Read(picByte, 0, picByte.Length) > 0){
-                            var picBase64 = Convert.ToBase64String(picByte);
-                        }else return;
-                        
-                 
+                            //stream -> base64
+                            var picByte = new byte[picStream.Length];
+                            string picBase64;
+                            picStream.Seek(0,SeekOrigin.Begin);
+                            if(picStream.Read(picByte, 0, picByte.Length) > 0){
+                                picBase64 = Convert.ToBase64String(picByte);
+                            }else throw new Exception("Error converting to base64");
 
+                            //reply
+                            picId++;
+                            picToCheck = picStream;
+                            var SnapReply = new wsReplySnap{
+                                state = "ok",
+                                requestId = request.requestId,
+                                picBase64 = picBase64,
+                                picId = picId,
+                                dist = dist
+                            };
+                            var SnapReplyJson = JsonSerializer.Serialize<wsReplySnap>(SnapReply);
+                            socket.Send(SnapReplyJson);
+                            
+                            
+
+                        }catch(Exception e){
+                            //error reply
+                            var errSnapReply = new wsReplySnap{
+                                state = "fail",
+                                requestId = request.requestId,
+                                picBase64 = e.Message,
+                                picId = -1,
+                                dist = -1
+                            };
+                            var errSnapReplyJson = JsonSerializer.Serialize<wsReplySnap>(errSnapReply);
+                            socket.Send(errSnapReplyJson);
+                        }
                         break;
                     case "check" :
                         if(registering == false)return;
-
+                        //parse
                         var checkRequest = JsonSerializer.Deserialize<wsRequestCheck>(msg);
                         if(checkRequest == null)return;
 
                         //check
 
+                        if(checkRequest.result == "accept"){
+                            if(checkRequest.picId == picId){
+                                try{
+                                    var dist = realGuardFrontEnd.frontEnd.register(picToCheck, registerName, registerId);
+                                    if(dist < 0)throw new Exception("Error registering picture");
 
-                        var checkReply = new wsReplyCheck{
-                            state = "ok",
-                            requestId = request.requestId,
-                            picId = checkRequest.picId,
-                            result = checkRequest.result
-                        };
-                        var checkReplyJson = JsonSerializer.Serialize<wsReplyCheck>(checkReply);
-                        socket.Send(checkReplyJson);
+                                    //reply
+                                    var checkReply = new wsReplyCheck{
+                                        state = "ok",
+                                        requestId = request.requestId,
+                                        picId = checkRequest.picId,
+                                        result = checkRequest.result
+                                    };
+                                    var checkReplyJson = JsonSerializer.Serialize<wsReplyCheck>(checkReply);
+                                    socket.Send(checkReplyJson);
+
+                                }catch(Exception e){
+                                    //reply
+                                    var errCheckReply = new wsReplyCheck{
+                                        state = "fail",
+                                        requestId = request.requestId,
+                                        picId = checkRequest.picId,
+                                        result = checkRequest.result
+                                    };
+                                    var errCheckReplyJson = JsonSerializer.Serialize<wsReplyCheck>(errCheckReply);
+                                    socket.Send(errCheckReplyJson);
+                                }
+                                
+                            }
+                            
+                        }
+
+
+                        
 
                         break;
 
                     case "over" :
                         if(registering == false)return;
 
-                        registering = false;
+                        registerFlagClear();
                         
                         var overReply = new wsReplyOver{
                             state = "over",
@@ -191,8 +252,6 @@ namespace realWebSocketServer
 
             }
 
-
-            return false;
         }
 
 
@@ -226,6 +285,14 @@ namespace realWebSocketServer
 
             if(token == "huxiaoan")return true;
             else return false;
+        }
+
+        private void registerFlagClear(){
+            registering = false;
+            picId = 0;
+            registerName = "";
+            registerId = "";
+            picToCheck = null;
         }
 
 

@@ -39,7 +39,7 @@ namespace realWebSocketServer{
 
     public class wsRequestCheck : wsRequest{
         public int picId{set; get;}
-        public string result{set; get;}
+        public string result{set; get;} //accept reject
     }
 
 
