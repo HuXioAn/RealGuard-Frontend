@@ -9,7 +9,7 @@ namespace realWebSocketServer{
 
     public class wsRequest{
 
-        public string request{set; get;}
+        public string request{set; get;} = "";
 
         public int requestId{set; get;}
 
@@ -24,8 +24,8 @@ namespace realWebSocketServer{
             requestId : 由web端生成
             token : 留空字符串
         */
-        public string username{set; get;}
-        public string password{set; get;}
+        public string username{set; get;} = "";
+        public string password{set; get;} = "";
 
     }
 
@@ -36,8 +36,8 @@ namespace realWebSocketServer{
             requestId : 由web端生成
             token : 被分到的token
         */
-        public string name{set; get;}
-        public string studentId{set; get;}
+        public string name{set; get;} = "";
+        public string studentId{set; get;} = "";
 
     }
 
@@ -61,7 +61,7 @@ namespace realWebSocketServer{
             result : 由用户给出的判别 通过accept 不通过reject
         */
         public int picId{set; get;}
-        public string result{set; get;} //accept reject
+        public string result{set; get;} = ""; //accept reject
     }
 
 

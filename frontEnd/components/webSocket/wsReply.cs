@@ -9,7 +9,7 @@ namespace realWebSocketServer{
 
     public class wsReply{
 
-        public string state{set; get;}
+        public string state{set; get;} = "";
 
         public int requestId{set; get;}
 
@@ -25,8 +25,8 @@ namespace realWebSocketServer{
             token: 认证通过后分发的token，失败为空
         */
 
-        public string username{set; get;}
-        public string token{set; get;}
+        public string username{set; get;} = "";
+        public string token{set; get;} = "";
 
     }
 
@@ -38,7 +38,7 @@ namespace realWebSocketServer{
             name: 重复收到的录入名称
         */
 
-        public string name{set; get;}
+        public string name{set; get;} = "";
     }
 
 
@@ -51,7 +51,7 @@ namespace realWebSocketServer{
             dist: 对于拍摄的照片的验证，在特殊情况（错误、第一张、未检测到）下为-1，其余应0~1
         */
 
-        public string picBase64{set; get;}
+        public string picBase64{set; get;} = "";
         public int picId{set; get;}
         public float dist{set; get;}
     }
@@ -65,7 +65,7 @@ namespace realWebSocketServer{
         */
 
         public int picId{set; get;}
-        public string result{set; get;}
+        public string result{set; get;} = "";
     }
 
 
