@@ -92,7 +92,9 @@ namespace realGuardFrontEnd{
                             }
                             break;
                         }
-                        if(!ioController.bodySensorRead())break;//失败且无人，取消继续检测
+                        if((!ioController.bodySensorRead()) || wsServer.registering == true)break;
+                        //失败且无人，取消继续检测
+                        //如果进入录入模式立马跳出
 
                     }
                     

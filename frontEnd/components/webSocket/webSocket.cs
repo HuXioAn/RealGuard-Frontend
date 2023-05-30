@@ -180,6 +180,7 @@ namespace realWebSocketServer
                         if(checkRequest.result == "accept"){
                             if(checkRequest.picId == picId){
                                 try{
+                                    if(picToCheck == null)throw new Exception("Check before snap");
                                     var dist = realGuardFrontEnd.frontEnd.register(picToCheck, registerName, registerId);
                                     if(dist < 0)throw new Exception("Error registering picture");
 
@@ -193,7 +194,7 @@ namespace realWebSocketServer
                                     var checkReplyJson = JsonSerializer.Serialize<wsReplyCheck>(checkReply);
                                     socket.Send(checkReplyJson);
 
-                                }catch(Exception e){
+                                }catch{
                                     //reply
                                     var errCheckReply = new wsReplyCheck{
                                         state = "fail",
