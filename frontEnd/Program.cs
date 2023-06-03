@@ -42,13 +42,19 @@ namespace realGuardFrontEnd{
 
                     var irImg = snap();
 
-                    var check = registerCheck(irImg,"Miles 郭","U202011451");
-                    WriteLine("Check dist: {}",check);
+                    try{
+                        var check = registerCheck(irImg,"Miles 郭","U202011451");
+                        WriteLine("Check dist: {0}",check);
 
-                    Thread.Sleep(1000);
+                        Thread.Sleep(1000);
 
-                    var reg = register(irImg,"Miles 郭","U202011451");
-                    WriteLine("Register dist: {}",reg);
+                        var reg = register(irImg,"Miles 郭","U202011451");
+                        WriteLine("Register dist: {0}",reg);
+                    }catch(Exception e){
+                        WriteLine("[!]Exception:"+e.Message);
+                    }
+
+                    
 
 
                     /*
