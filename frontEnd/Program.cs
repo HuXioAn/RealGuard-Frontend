@@ -28,17 +28,30 @@ namespace realGuardFrontEnd{
 
                 systemInit(rpcAddress);
 
-                var wsServer = new realWebSocketServer.realWebSocketServer(wsAddress);
+                //var wsServer = new realWebSocketServer.realWebSocketServer(wsAddress);
 
                 while(true){
                     //业务逻辑
-                    while((!ioController!.bodySensorRead()) || wsServer.registering == true){
+                    while((!ioController!.bodySensorRead())){
                         Thread.Sleep(100);
                     }
                     Thread.Sleep(500);
                     WriteLine("Body Triggered");//人体触发
 
                     WriteLine("Fetching IR Image.");
+
+                    var irImg = snap();
+
+                    var check = registerCheck(irImg,"Miles 郭","U202011451");
+                    WriteLine("Check dist: {}",check);
+
+                    Thread.Sleep(1000);
+
+                    var reg = register(irImg,"Miles 郭","U202011451");
+                    WriteLine("Register dist: {}",reg);
+
+
+                    /*
                     var irImgStream = new MemoryStream();
                     var irImgStreamToRequest = new MemoryStream();
 
@@ -97,7 +110,12 @@ namespace realGuardFrontEnd{
                         //如果进入录入模式立马跳出
 
                     }
+
+                    */
                     
+                
+                
+                
                 }
 
                 //资源回收善后
