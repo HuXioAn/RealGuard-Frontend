@@ -29,20 +29,27 @@ namespace realWebSocketServer
             
             wsServer.Start(socket => {
                 socket.OnOpen = () => {
+                    WriteLine("[*]Socket Open");
                     if(aliveList.Count() == 0)registerFlagClear();
                     aliveList.Add(socket);
                 };
                 socket.OnMessage = (message) => {
+                    WriteLine("[*]Msg coming");
+
                     wsMessage(socket,message);
                 };
                 socket.OnClose = () => 
                 {
+                    WriteLine("[*]Socket Closed");
+
                     aliveList.Remove(socket);
                     
                     if(authList.Contains(socket))authList.Remove(socket);
                     registerFlagClear();
                 };
                 socket.OnError = (e) => {
+                    WriteLine("[*]Error Happening");
+
                     aliveList.Remove(socket);
                     if(authList.Contains(socket))authList.Remove(socket);
                     registerFlagClear();
