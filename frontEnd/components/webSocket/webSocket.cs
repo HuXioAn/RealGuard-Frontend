@@ -142,7 +142,7 @@ namespace realWebSocketServer
 
                             //stream -> base64
                             var picByte = new byte[picStream.Length];
-                            WriteLine("stream length:{0}");
+                            WriteLine("stream length:{0}",picStream.Length);
                             string picBase64;
                             picStream.Seek(0,SeekOrigin.Begin);
                             var readbyte = picStream.Read(picByte, 0, picByte.Length);
