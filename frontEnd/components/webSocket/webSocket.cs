@@ -107,7 +107,11 @@ namespace realWebSocketServer
                 switch (request.request)
                 {
                     case "register" :
+                        WriteLine("Register triggered");
                         if(registering == true)return;
+                        WriteLine("Register started");
+                        
+                        
                         //parse
                         var registerRequest = JsonSerializer.Deserialize<wsRequestRegister>(msg);
                         if(registerRequest == null)return;
@@ -228,7 +232,13 @@ namespace realWebSocketServer
                     case "over" :
                         if(registering == false)return;
 
+                        WriteLine("id before clean:{0}",request.requestId);
+
+
                         registerFlagClear();
+
+                        WriteLine("id after clean:{0}",request.requestId);
+
                         
                         var overReply = new wsReplyOver{
                             state = "over",
