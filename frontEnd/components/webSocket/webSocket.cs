@@ -34,7 +34,7 @@ namespace realWebSocketServer
                     aliveList.Add(socket);
                 };
                 socket.OnMessage = (message) => {
-                    WriteLine("[*]Msg coming");
+                    WriteLine("[*]Msg coming:{0}",message);
 
                     wsMessage(socket,message);
                 };
