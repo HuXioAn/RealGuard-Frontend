@@ -8,6 +8,7 @@
   </PropertyGroup>
 
     <ItemGroup>
+    <PackageReference Include="Fleck" Version="1.2.0" />
     <PackageReference Include="Intel.RealSenseWithNativeDll" Version="2.51.1.1" />
     <PackageReference Include="librealsense.x64" Version="2.45.1" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
