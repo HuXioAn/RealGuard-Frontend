@@ -247,12 +247,21 @@ namespace realWebSocketServer
         private bool wsServiceAuth(string msg){
 
             var request = wsRequestParse(msg);
-            if(null == request)return false;
+            if(null == request){
+                WriteLine("[!]parse fail 1");
+                return false;
+
+            }
 
             if(request.request != "auth")return false;
             else{
                 var authRequest = JsonSerializer.Deserialize<wsRequestAuth>(msg);
-                if(null == authRequest)return false;
+                if(null == authRequest){
+                    WriteLine("[!]parse fail 2");
+                    return false;
+                }
+
+                WriteLine("usrname:{0},pwd:{1}",authRequest.username,authRequest.password);
 
                 if(authRequest.username == "focus_realguard" && authRequest.password == "crazy_thursday")
                 return true;
