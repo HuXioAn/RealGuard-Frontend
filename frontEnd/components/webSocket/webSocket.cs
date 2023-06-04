@@ -142,9 +142,12 @@ namespace realWebSocketServer
 
                             //stream -> base64
                             var picByte = new byte[picStream.Length];
+                            WriteLine("stream length:{0}");
                             string picBase64;
                             picStream.Seek(0,SeekOrigin.Begin);
-                            if(picStream.Read(picByte, 0, picByte.Length) > 0){
+                            var readbyte = picStream.Read(picByte, 0, picByte.Length);
+                            WriteLine("read byte:{0}",readbyte);
+                            if(readbyte > 0){
                                 picBase64 = Convert.ToBase64String(picByte);
                             }else throw new Exception("Error converting to base64");
 
