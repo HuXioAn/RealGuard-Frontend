@@ -16,7 +16,7 @@ namespace realGuardFrontEnd{
 
         private static string rpcAddress = "http://localhost:5051";
 
-        private static string wsAddress = "ws://localhost:5050";
+        private static string wsAddress = "ws://0.0.0.0:5050";
 
         //public static bool registerFlag = false;
 
